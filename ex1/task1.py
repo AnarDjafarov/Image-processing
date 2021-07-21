@@ -108,7 +108,7 @@ def quantize_inv(G, quality=50):
     return B.astype('int16')
 
 
-def main_function(image: str, quality):
+def main(image: str, quality):
     im = cv2.imread(image)
     im = cv2.resize(im, (0, 0), fx=0.5, fy=0.5)
     rows, cols, ch = im.shape
@@ -132,21 +132,18 @@ def main_function(image: str, quality):
         for col in range(0, cols, 8):
             # block = YCrCb[row:row+16,col:col+16]
             # Y = block[:,:,0]; Cb = block[:,:,1]; Cr = block[:,:,2]
-            YCrCb[row:row + 8, col:col + 8, 0] = vint(
-                DCT_8x8_2D(quantize_inv(DCT_8x8_2D(YCrCb[row:row + 8, col:col + 8, 0]), quality), 0, 1) + 128)
-            YCrCb[row:row + 8, col:col + 8, 1] = vint(
-                DCT_8x8_2D(quantize_inv(DCT_8x8_2D(YCrCb[row:row + 8, col:col + 8, 1]), quality), 0, 1) + 128)
-            YCrCb[row:row + 8, col:col + 8, 2] = vint(
-                DCT_8x8_2D(quantize_inv(DCT_8x8_2D(YCrCb[row:row + 8, col:col + 8, 2]), quality), 0, 1) + 128)
+            YCrCb[row:row + 8, col:col + 8, 0] = vint(DCT_8x8_2D(quantize_inv(DCT_8x8_2D(YCrCb[row:row + 8, col:col + 8, 0]), quality), 0, 1) + 128)
+            YCrCb[row:row + 8, col:col + 8, 1] = vint(DCT_8x8_2D(quantize_inv(DCT_8x8_2D(YCrCb[row:row + 8, col:col + 8, 1]), quality), 0, 1) + 128)
+            YCrCb[row:row + 8, col:col + 8, 2] = vint(DCT_8x8_2D(quantize_inv(DCT_8x8_2D(YCrCb[row:row + 8, col:col + 8, 2]), quality), 0, 1) + 128)
     
     im1 = np.zeros((rows, cols, ch), dtype=np.uint8)
     im1 = cv2.cvtColor(YCrCb, cv2.COLOR_YCR_CB2RGB)
     show(im1)
-    cv2.imwrite(img.split('.')[0] +"_output_quality" + str(quality) + ".jpg",im1)
+    cv2.imwrite(img.split('.')[0] +"_output" + str(quality) + ".jpg",im1)
 
 
 if __name__ == "__main__":
     img = "jpg.jpg"
-    main_function(img, quality=10)
-    main_function(img, quality=5)
-    main_function(img, quality=2)
+    main(img, quality=10)
+    main(img, quality=5)
+    main(img, quality=2)
